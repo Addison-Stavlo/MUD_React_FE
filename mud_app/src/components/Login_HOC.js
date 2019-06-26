@@ -7,11 +7,15 @@ export default function Login_HOC(Component) {
       isLoggedIn: false
     };
 
+    logIn = () => {
+      this.setState({ isLoggedIn: true });
+    };
+
     render() {
       if (this.state.isLoggedIn) {
         return <Component />;
       } else {
-        return <Login />;
+        return <Login logIn={this.logIn} />;
       }
     }
   };
