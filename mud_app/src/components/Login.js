@@ -1,0 +1,161 @@
+import React, { useState } from "react";
+
+export default function Login(props) {
+  const [state, setState] = useState({
+    username: "",
+    password: "",
+    password2: "",
+    isRegistering: false,
+    passwordsMatch: false,
+    passwordError: false,
+    registrationErrors: []
+  });
+
+  const handleChange = ev => {
+    setState({
+      ...state,
+      [ev.target.name]: ev.target.value
+    });
+  };
+
+  const toggleRegistering = ev => {
+    ev.preventDefault();
+    setState({
+      ...state,
+      isRegistering: !state.isRegistering
+    });
+  };
+
+  function checkPasswords() {
+    if (state.password === state.password2) {
+      setState({ ...state, passwordsMatch: true, passwordError: false });
+      return true;
+    } else {
+      setState({ ...state, passwordError: true });
+      return false;
+    }
+  }
+
+  const register = async ev => {
+    ev.preventDefault();
+    if (checkPasswords()) {
+      setState({ ...state, registrationErrors: [] });
+
+      let info = {
+        username: state.username,
+        password1: state.password,
+        password2: state.password2
+      };
+
+      let responseRaw = await fetch("http://localhost:8000/api/registration/", {
+        method: "post",
+        body: JSON.stringify(info),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      let response = await responseRaw.json();
+
+      if (responseRaw.status === 201) {
+        localStorage.setItem("token", response.key);
+        props.logIn();
+      } else {
+        console.log(response);
+        const errorsToAdd = [];
+        if (response.username) {
+          // if username is taken
+          // response.username[0] = "A user with that username alreadey exists"
+          errorsToAdd.push(...response.username);
+        }
+        if (response.password1) {
+          // if password is
+          // response.password1 = [array of string errors]
+          errorsToAdd.push(...response.password1);
+        }
+        if (response.non_field_errors) {
+          // if passwords dont match
+          // response.non_field_errors[0] = "The two password fields didn't match"
+          errorsToAdd.push(...response.non_field_errors);
+        }
+
+        setState({ ...state, registrationErrors: errorsToAdd });
+      }
+    }
+  };
+
+  const login = async ev => {
+    ev.preventDefault();
+    setState({ ...state, registrationErrors: [] });
+    let info = {
+      username: state.username,
+      password: state.password
+    };
+
+    let responseRaw = await fetch("http://localhost:8000/api/login/", {
+      method: "post",
+      body: JSON.stringify(info),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    let response = await responseRaw.json();
+
+    if (responseRaw.status === 200) {
+      localStorage.setItem("token", response.key);
+      props.logIn();
+    } else {
+      if (response.non_field_errors) {
+        // invalid credentials
+        setState({
+          ...state,
+          registrationErrors: response.non_field_errors
+        });
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={state.isRegistering ? register : login}>
+      <h1>
+        {state.isRegistering ? "Register Your Account" : "Login to Continue"}
+      </h1>
+
+      <input
+        name="username"
+        placeholder="username"
+        onChange={handleChange}
+        value={state.username}
+      />
+      <input
+        name="password"
+        type="password"
+        placeholder="password"
+        onChange={handleChange}
+        value={state.password}
+      />
+      {/* Second password field for registration */}
+      {state.isRegistering ? (
+        <input
+          name="password2"
+          type="password"
+          placeholder="confirm password"
+          onChange={handleChange}
+          value={state.password2}
+        />
+      ) : null}
+
+      <button type="submit">
+        {state.isRegistering ? "Register" : "Log-In"}
+      </button>
+      <button onClick={toggleRegistering}>
+        {state.isRegistering ? "Already Signed Up?" : "Need to Sign Up?"}
+      </button>
+      {state.passwordError ? "Passwords Do Not Match" : null}
+      {state.registrationErrors.map(error => (
+        <p key={error}>{error}</p>
+      ))}
+    </form>
+  );
+}
