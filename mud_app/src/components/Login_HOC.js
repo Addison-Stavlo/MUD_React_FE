@@ -7,8 +7,9 @@ export default function Login_HOC(Component) {
       isLoggedIn: false
     };
 
-    logIn = () => {
+    logIn = key => {
       this.setState({ isLoggedIn: true });
+      localStorage.setItem("token", key);
     };
 
     render() {
