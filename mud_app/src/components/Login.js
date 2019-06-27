@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { Alert, Form, Button } from "react-bootstrap";
+// import Form from "react-bootstrap/Form";
+// import Button from "react-bootstrap/Button";
+import styled from "styled-components";
 
 export default function Login(props) {
   const [state, setState] = useState({
@@ -20,7 +24,8 @@ export default function Login(props) {
     ev.preventDefault();
     setState({
       ...state,
-      isRegistering: !state.isRegistering
+      isRegistering: !state.isRegistering,
+      registrationErrors: []
     });
   };
 
@@ -95,46 +100,90 @@ export default function Login(props) {
   }
 
   return (
-    <form onSubmit={state.isRegistering ? register : login}>
-      <h1>
-        {state.isRegistering ? "Register Your Account" : "Login to Continue"}
-      </h1>
-
-      <input
-        name="username"
-        placeholder="username"
-        onChange={handleChange}
-        value={state.username}
-      />
-      <input
-        name="password"
-        type="password"
-        placeholder="password"
-        onChange={handleChange}
-        value={state.password}
-      />
-      {/* Second password field for registration */}
-      {state.isRegistering ? (
-        <input
-          name="password2"
-          type="password"
-          placeholder="confirm password"
+    <FormHolder>
+      <StyledForm onSubmit={state.isRegistering ? register : login}>
+        <h1>
+          {state.isRegistering ? "Register Your Account" : "Login to Continue"}
+        </h1>
+        <Form.Label>Username</Form.Label>
+        <Form.Control
+          name="username"
+          placeholder="username"
           onChange={handleChange}
-          value={state.password2}
+          value={state.username}
         />
-      ) : null}
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          name="password"
+          type="password"
+          placeholder="password"
+          onChange={handleChange}
+          value={state.password}
+        />
+        {/* Second password field for registration */}
+        {state.isRegistering ? (
+          <>
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control
+              name="password2"
+              type="password"
+              placeholder="confirm password"
+              onChange={handleChange}
+              value={state.password2}
+            />
+          </>
+        ) : null}
 
-      <button type="submit">
-        {state.isRegistering ? "Register" : "Log-In"}
-      </button>
-      <button onClick={toggleRegistering}>
-        {state.isRegistering ? "Already Signed Up?" : "Need to Sign Up?"}
-      </button>
+        <Button variant="primary" type="submit">
+          {state.isRegistering ? "Register" : "Log-In"}
+        </Button>
+        <Button variant="outline-primary" onClick={toggleRegistering}>
+          {state.isRegistering ? "Already Signed Up?" : "Need to Sign Up?"}
+        </Button>
 
-      {/* list of errors for login or registration failure */}
-      {state.registrationErrors.map(error => (
-        <p key={error}>{error}</p>
-      ))}
-    </form>
+        {/* list of errors for login or registration failure */}
+        {state.registrationErrors.map(error => (
+          <Alert key={error} variant={"danger"}>
+            {error}
+          </Alert>
+        ))}
+      </StyledForm>
+    </FormHolder>
   );
 }
+
+const StyledForm = styled.form`
+  background: white;
+  color: black;
+  margin: 20px auto;
+  min-width: 300px;
+  width: 90vw;
+  max-width: 500px;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px 0 lightgray;
+  z-index: 10;
+
+  button {
+    margin: 20px 10px 0;
+  }
+  .form-label {
+    margin-bottom: 0;
+  }
+  input {
+    margin-bottom: 5px;
+  }
+`;
+
+const FormHolder = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background: rgba(50, 50, 50, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
