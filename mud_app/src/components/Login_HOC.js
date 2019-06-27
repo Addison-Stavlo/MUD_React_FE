@@ -8,10 +8,9 @@ export default function Login_HOC(Component) {
     };
 
     componentDidMount() {
-      //check for token
-      let token = localStorage.getItem("token");
       //currently using infinite duration token, no need to check expiration
-      if (token) {
+      // token => loggedIn
+      if (localStorage.getItem("token")) {
         this.setState({ isLoggedIn: true });
       }
     }
