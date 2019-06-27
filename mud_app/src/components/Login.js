@@ -100,62 +100,69 @@ export default function Login(props) {
   }
 
   return (
-    <StyledForm onSubmit={state.isRegistering ? register : login}>
-      <h1>
-        {state.isRegistering ? "Register Your Account" : "Login to Continue"}
-      </h1>
-      <Form.Label>Username</Form.Label>
-      <Form.Control
-        name="username"
-        placeholder="username"
-        onChange={handleChange}
-        value={state.username}
-      />
-      <Form.Label>Password</Form.Label>
-      <Form.Control
-        name="password"
-        type="password"
-        placeholder="password"
-        onChange={handleChange}
-        value={state.password}
-      />
-      {/* Second password field for registration */}
-      {state.isRegistering ? (
-        <>
-          <Form.Label>Confirm Password</Form.Label>
-          <Form.Control
-            name="password2"
-            type="password"
-            placeholder="confirm password"
-            onChange={handleChange}
-            value={state.password2}
-          />
-        </>
-      ) : null}
+    <FormHolder>
+      <StyledForm onSubmit={state.isRegistering ? register : login}>
+        <h1>
+          {state.isRegistering ? "Register Your Account" : "Login to Continue"}
+        </h1>
+        <Form.Label>Username</Form.Label>
+        <Form.Control
+          name="username"
+          placeholder="username"
+          onChange={handleChange}
+          value={state.username}
+        />
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          name="password"
+          type="password"
+          placeholder="password"
+          onChange={handleChange}
+          value={state.password}
+        />
+        {/* Second password field for registration */}
+        {state.isRegistering ? (
+          <>
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control
+              name="password2"
+              type="password"
+              placeholder="confirm password"
+              onChange={handleChange}
+              value={state.password2}
+            />
+          </>
+        ) : null}
 
-      <Button variant="primary" type="submit">
-        {state.isRegistering ? "Register" : "Log-In"}
-      </Button>
-      <Button variant="outline-primary" onClick={toggleRegistering}>
-        {state.isRegistering ? "Already Signed Up?" : "Need to Sign Up?"}
-      </Button>
+        <Button variant="primary" type="submit">
+          {state.isRegistering ? "Register" : "Log-In"}
+        </Button>
+        <Button variant="outline-primary" onClick={toggleRegistering}>
+          {state.isRegistering ? "Already Signed Up?" : "Need to Sign Up?"}
+        </Button>
 
-      {/* list of errors for login or registration failure */}
-      {state.registrationErrors.map(error => (
-        <Alert key={error} variant={"danger"}>
-          {error}
-        </Alert>
-      ))}
-    </StyledForm>
+        {/* list of errors for login or registration failure */}
+        {state.registrationErrors.map(error => (
+          <Alert key={error} variant={"danger"}>
+            {error}
+          </Alert>
+        ))}
+      </StyledForm>
+    </FormHolder>
   );
 }
 
 const StyledForm = styled.form`
+  background: white;
+  color: black;
   margin: 20px auto;
-  max-width: 600px;
+  min-width: 300px;
+  width: 90vw;
+  max-width: 500px;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 0 10px 0 lightgray;
+  z-index: 10;
 
   button {
     margin: 20px 10px 0;
@@ -166,4 +173,17 @@ const StyledForm = styled.form`
   input {
     margin-bottom: 5px;
   }
+`;
+
+const FormHolder = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background: rgba(50, 50, 50, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 `;
