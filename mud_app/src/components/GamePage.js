@@ -1,6 +1,7 @@
 import React from "react";
 import Login_HOC from "./Login_HOC";
-import { Alert, Button } from "react-bootstrap";
+import { Alert, Button, Jumbotron, ListGroup } from "react-bootstrap";
+import PlayerList from "./chatInterface/PlayerList";
 
 function GamePage(props) {
   const [roomInfo, setRoomInfo] = React.useState({ players: [] });
@@ -37,9 +38,11 @@ function GamePage(props) {
 
   return (
     <>
-      <h1>Room: {roomInfo.title}</h1>
-      <h2>{roomInfo.description}</h2>
-      <h3>Players in Room: {roomInfo.players.map(player => player)}</h3>
+      <Jumbotron>
+        <h1>{roomInfo.title}</h1>
+        <h2>{roomInfo.description}</h2>
+      </Jumbotron>
+      <PlayerList players={roomInfo.players} />
       {roomInfo.error_msg ? (
         <Alert variant={"danger"}>{roomInfo.error_msg}</Alert>
       ) : null}
