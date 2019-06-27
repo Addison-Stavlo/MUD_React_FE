@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Alert from "react-bootstrap/Alert";
+import Form from "react-bootstrap/Form";
 
 export default function Login(props) {
   const [state, setState] = useState({
@@ -95,18 +97,18 @@ export default function Login(props) {
   }
 
   return (
-    <form onSubmit={state.isRegistering ? register : login}>
+    <Form onSubmit={state.isRegistering ? register : login}>
       <h1>
         {state.isRegistering ? "Register Your Account" : "Login to Continue"}
       </h1>
 
-      <input
+      <Form.Control
         name="username"
         placeholder="username"
         onChange={handleChange}
         value={state.username}
       />
-      <input
+      <Form.Control
         name="password"
         type="password"
         placeholder="password"
@@ -115,7 +117,7 @@ export default function Login(props) {
       />
       {/* Second password field for registration */}
       {state.isRegistering ? (
-        <input
+        <Form.Control
           name="password2"
           type="password"
           placeholder="confirm password"
@@ -133,8 +135,10 @@ export default function Login(props) {
 
       {/* list of errors for login or registration failure */}
       {state.registrationErrors.map(error => (
-        <p key={error}>{error}</p>
+        <Alert key={error} variant={"danger"}>
+          {error}
+        </Alert>
       ))}
-    </form>
+    </Form>
   );
 }
