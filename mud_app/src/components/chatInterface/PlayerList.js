@@ -14,7 +14,7 @@ export default function PlayerList(props) {
       <h3>Players in Room: </h3>
       <ListGroup>
         {props.players.map(player => (
-          <ListGroup.Item>{player}</ListGroup.Item>
+          <ListGroup.Item key={player}>{player}</ListGroup.Item>
         ))}
       </ListGroup>
     </PlayersList>
@@ -22,12 +22,9 @@ export default function PlayerList(props) {
 }
 
 const PlayersList = styled.div`
-  /* display: flex;
-    flex-direction: column; */
   width: 300px;
   min-height: 300px;
   max-height: 600px;
-  /* border: 1px solid lightgray; */
   border-radius: 5px;
   box-shadow: 0 0 10px 0 lightgray;
 

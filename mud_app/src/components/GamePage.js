@@ -3,6 +3,7 @@ import Login_HOC from "./Login_HOC";
 import { Alert, Button, Jumbotron, ListGroup } from "react-bootstrap";
 import PlayerList from "./chatInterface/PlayerList";
 import MovementController from "./movement/MovementController";
+import ChatWindow from "./chatInterface/ChatWindow";
 
 function GamePage(props) {
   const [roomInfo, setRoomInfo] = React.useState({ players: [] });
@@ -44,6 +45,7 @@ function GamePage(props) {
         <h2>{roomInfo.description}</h2>
       </Jumbotron>
       <PlayerList players={roomInfo.players} />
+      <ChatWindow />
       <MovementController move={move} error={roomInfo.error_msg} />
     </>
   );
