@@ -8,15 +8,6 @@ export default function ChatWindow(props) {
     chatLines[i] = `This is test chat line #${i} - cool beans!`;
   }
 
-  React.useEffect(() => {
-    scrollDown();
-  }, [props.chatLines]);
-
-  let endLog;
-  const scrollDown = () => {
-    endLog.scrollIntoView({ behavior: "smooth" });
-  };
-
   const submitChat = ev => {
     ev.preventDefault();
   };
@@ -51,6 +42,8 @@ export default function ChatWindow(props) {
       text-align: left;
       padding: 10px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
     }
 
     hr {
@@ -68,19 +61,14 @@ export default function ChatWindow(props) {
       <Jumbotron>
         <div className="text-log-area">
           {props.chatLines.map(line => (
-            <>
-              <StyledChatLine key={line.id} color={convertChatType(line.type)}>
+            <div key={line.id}>
+              <StyledChatLine color={convertChatType(line.type)}>
                 {line.time.getHours()}:{line.time.getMinutes()}:
                 {line.time.getSeconds()} - {line.text}
               </StyledChatLine>
               <hr />
-            </>
+            </div>
           ))}
-          <div
-            ref={el => {
-              endLog = el;
-            }}
-          />
         </div>
         <Form onSubmit={submitChat}>
           <Form.Control name="chat-input" placeholder="enter text here..." />
