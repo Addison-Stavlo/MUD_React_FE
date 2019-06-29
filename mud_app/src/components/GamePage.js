@@ -44,14 +44,14 @@ function GamePage(props) {
   function createRoomEntryText(response) {
     let d = new Date();
     setChatLines([
-      ...chatLines,
+      { text: response.description, type: "env", time: d, id: d.getTime() + 1 },
       {
         text: `You have entered:  ${response.title}`,
         type: "env",
         time: d,
         id: d.getTime()
       },
-      { text: response.description, type: "env", time: d, id: d.getTime() + 1 }
+      ...chatLines
     ]);
   }
 
