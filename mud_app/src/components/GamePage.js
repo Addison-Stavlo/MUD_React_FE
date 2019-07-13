@@ -1,19 +1,31 @@
 import React from "react";
+import Pusher from "pusher-js";
 import Login_HOC from "./Login_HOC";
-import { Jumbotron } from "react-bootstrap";
+import { Jumbotron, Button } from "react-bootstrap";
 import PlayerList from "./chatInterface/PlayerList";
 import MovementController from "./movement/MovementController";
 import ChatWindow from "./chatInterface/ChatWindow";
 
-function GamePage(props) {
-  const [roomInfo, setRoomInfo] = React.useState({ players: [] });
-  const [chatLines, setChatLines] = React.useState([]);
+Pusher.logToConsole = true;
 
-  React.useEffect(() => {
-    initGame();
-  }, []);
+const pusher = new Pusher("8e7cc001ce024615bdf7", {
+  cluster: "us2",
+  forceTLS: true
+});
 
-  const initGame = async () => {
+const channel = pusher.subscribe("say-channel");
+
+class GamePage extends React.Component {
+  state = {
+    chatLines: [],
+    roomInfo: { players: [] }
+  };
+
+  componentDidMount() {
+    this.initGame();
+  }
+
+  initGame = async () => {
     let responseRaw = await fetch("http://localhost:8000/api/adv/init/", {
       method: "get",
       headers: {
@@ -22,11 +34,11 @@ function GamePage(props) {
       }
     });
     let response = await responseRaw.json();
-    setRoomInfo(response);
-    createRoomEntryText(response);
+    this.setState({ roomInfo: response });
+    this.createRoomEntryText(response);
   };
 
-  async function move(dir) {
+  async move(dir) {
     let responseRaw = await fetch("http://localhost:8000/api/adv/move/", {
       method: "post",
       body: JSON.stringify({ direction: dir }),
@@ -36,36 +48,71 @@ function GamePage(props) {
       }
     });
     let response = await responseRaw.json();
-    console.log(response);
-    setRoomInfo(response);
-    createRoomEntryText(response);
+    this.setState({ roomInfo: response });
+    this.createRoomEntryText(response);
   }
 
-  function createRoomEntryText(response) {
+  say(phrase) {
+    fetch("http://localhost:8000/api/adv/say/", {
+      method: "post",
+      body: JSON.stringify({ message: phrase }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${localStorage.getItem("token")}`
+      }
+    });
+  }
+
+  createRoomEntryText(room) {
     let d = new Date();
-    setChatLines([
-      { text: response.description, type: "env", time: d, id: d.getTime() + 1 },
-      {
-        text: `You have entered:  ${response.title}`,
-        type: "env",
-        time: d,
-        id: d.getTime()
-      },
-      ...chatLines
-    ]);
+    this.setState({
+      chatLines: [
+        { text: room.description, type: "env", time: d, id: d.getTime() + 1 },
+        {
+          text: `You have entered:  ${room.title}`,
+          type: "env",
+          time: d,
+          id: d.getTime()
+        },
+        ...this.state.chatLines
+      ]
+    });
+    // subscribe to new room event channel
+    channel.bind(room.title, this.createSayText);
   }
 
-  return (
-    <>
-      <Jumbotron>
-        <h1>{roomInfo.title}</h1>
-        <h2>{roomInfo.description}</h2>
-      </Jumbotron>
-      <PlayerList players={roomInfo.players} />
-      <ChatWindow chatLines={chatLines} />
-      <MovementController move={move} error={roomInfo.error_msg} />
-    </>
-  );
+  createSayText = data => {
+    let d = new Date();
+    this.setState({
+      chatLines: [
+        {
+          text: `${data.player} says "${data.message}"`,
+          type: "say",
+          time: d,
+          id: d.getTime()
+        },
+        ...this.state.chatLines
+      ]
+    });
+  };
+
+  render() {
+    return (
+      <>
+        <Button onClick={this.props.logOut}>Log Out</Button>
+        <Jumbotron>
+          <h1>{this.state.roomInfo.title}</h1>
+          <h2>{this.state.roomInfo.description}</h2>
+        </Jumbotron>
+        <PlayerList players={this.state.roomInfo.players} />
+        <ChatWindow chatLines={this.state.chatLines} say={this.say} />
+        <MovementController
+          move={this.move}
+          error={this.state.roomInfo.error_msg}
+        />
+      </>
+    );
+  }
 }
 
 export default Login_HOC(GamePage);
