@@ -38,7 +38,7 @@ class GamePage extends React.Component {
     this.createRoomEntryText(response);
   };
 
-  async move(dir) {
+  move = async dir => {
     let responseRaw = await fetch("http://localhost:8000/api/adv/move/", {
       method: "post",
       body: JSON.stringify({ direction: dir }),
@@ -50,9 +50,9 @@ class GamePage extends React.Component {
     let response = await responseRaw.json();
     this.setState({ roomInfo: response });
     this.createRoomEntryText(response);
-  }
+  };
 
-  say(phrase) {
+  say = phrase => {
     fetch("http://localhost:8000/api/adv/say/", {
       method: "post",
       body: JSON.stringify({ message: phrase }),
@@ -61,9 +61,9 @@ class GamePage extends React.Component {
         Authorization: `token ${localStorage.getItem("token")}`
       }
     });
-  }
+  };
 
-  createRoomEntryText(room) {
+  createRoomEntryText = room => {
     let d = new Date();
     this.setState({
       chatLines: [
@@ -79,7 +79,7 @@ class GamePage extends React.Component {
     });
     // subscribe to new room event channel
     channel.bind(room.title, this.createSayText);
-  }
+  };
 
   createSayText = data => {
     let d = new Date();
