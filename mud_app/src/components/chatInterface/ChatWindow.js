@@ -2,26 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { Jumbotron, Form } from "react-bootstrap";
 
-export default class ChatWindow extends React.Component {
-  state = { chatInput: "" };
+export default function ChatWindow(props) {
+  let [input, setInput] = React.useState("");
 
-  handleChange = ev => {
-    // ev.preventDefault();
-    // ev.stopPropagation();
-    this.setState({
-      [ev.target.name]: ev.target.value
-    });
-  };
-
-  submitChat = ev => {
+  let submitChat = ev => {
     ev.preventDefault();
-    this.props.say(this.state.chatInput);
-    this.setState({
-      chatInput: ""
-    });
+    props.say(input);
+    setInput("");
   };
 
-  convertChatType(type) {
+  const handleChange = set => ev => {
+    set(ev.target.value);
+  };
+
+  function convertChatType(type) {
     switch (type) {
       case "env":
         return "green";
@@ -34,35 +28,32 @@ export default class ChatWindow extends React.Component {
     }
   }
 
-  render() {
-    return (
-      <ChatBox>
-        <Jumbotron>
-          <div className="text-log-area">
-            {this.props.chatLines.map(line => (
-              <div key={line.id}>
-                <StyledChatLine color={this.convertChatType(line.type)}>
-                  {line.time.getHours()}:{line.time.getMinutes()}:
-                  {line.time.getSeconds()} - {line.text}
-                </StyledChatLine>
-                <hr />
-              </div>
-            ))}
-          </div>
-          <Form onSubmit={this.submitChat}>
-            <Form.Control
-              name="chatInput"
-              placeholder="enter text here..."
-              value={this.state.chatInput}
-              onChange={this.handleChange}
-            />
-          </Form>
-        </Jumbotron>
-      </ChatBox>
-    );
-  }
+  return (
+    <ChatBox>
+      <Jumbotron>
+        <div className="text-log-area">
+          {props.chatLines.map(line => (
+            <div key={line.id}>
+              <StyledChatLine color={convertChatType(line.type)}>
+                {line.time.getHours()}:{line.time.getMinutes()}:
+                {line.time.getSeconds()} - {line.text}
+              </StyledChatLine>
+              <hr />
+            </div>
+          ))}
+        </div>
+        <Form onSubmit={submitChat}>
+          <Form.Control
+            name="chatInput"
+            placeholder="enter text here..."
+            value={input}
+            onChange={handleChange(setInput)}
+          />
+        </Form>
+      </Jumbotron>
+    </ChatBox>
+  );
 }
-
 const ChatBox = styled.div`
   max-width: 700px;
 
